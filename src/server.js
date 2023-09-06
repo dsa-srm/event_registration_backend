@@ -13,62 +13,117 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const pg_promise_1 = __importDefault(require("pg-promise"));
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
-const pg_promise_1 = __importDefault(require("pg-promise"));
+app.use(express_1.default.json());
 const dbConfig = {
-    host: 'eventregtest.cxr56pugwihj.ap-south-2.rds.amazonaws.com',
+    host: 'eventregistration.cxr56pugwihj.ap-south-2.rds.amazonaws.com',
     port: 5432,
-    database: 'eventregtest',
+    database: 'EventReg',
     user: 'techdsa',
-    password: 'techDSA2023$',
+    password: 'password',
+    ssl: {
+        rejectUnauthorized: false, // this was the problem
+    },
 };
 const pgp = (0, pg_promise_1.default)();
 const db = pgp(dbConfig);
+// async function testConnection() {
+//   const c = await db.connect(); // try to connect
+//   c.done(); // success, release connection
+//   return c.client.serverVersion; // return server version
+// }
+// testConnection();
 const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS sample_table (
-      id serial PRIMARY KEY,
-      name VARCHAR(255),
-      email VARCHAR(255)
-    )
-  `;
+  CREATE TABLE IF NOT EXISTS sample_table (
+    id serial PRIMARY KEY,
+    name VARCHAR(255),
+    email VARCHAR(255)
+  )
+`;
 function createTable() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            // Execute the SQL query to create the table
             yield db.none(createTableQuery);
             console.log('Table created successfully');
         }
         catch (error) {
             console.error('Error creating table:', error);
         }
-        finally {
-            // Close the database connection
-            pgp.end();
-        }
     });
 }
-function testTable() {
+function insertSampleRecord() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            // Insert a sample record into the table
             yield db.none('INSERT INTO sample_table(name, email) VALUES($1, $2)', ['bob Thebuilder', 'bob@srmist.com']);
             console.log('Record inserted successfully');
         }
         catch (error) {
             console.error('Error inserting record:', error);
         }
-        finally {
-            // Close the database connection
-            pgp.end();
+    });
+}
+// async function fetchSampleData() {
+//   try {
+//     const data = await db.any('SELECT * FROM sample_table');
+//     console.log('Fetched Data:', data);
+//   } catch (error) {
+//     console.error('Error fetching data:', error);
+//   }
+// }
+function fetchSampleData() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const data = yield db.any('SELECT * FROM sample_table');
+            console.log('Fetched Data:', data);
+            return data; //return
+        }
+        catch (error) {
+            console.error('Error fetching data:', error);
+            throw error;
         }
     });
 }
-createTable();
-testTable();
+// createTable();
+// insertSampleRecord();
+fetchSampleData();
 app.get('/', (req, res) => {
     res.send('Hello, TypeScript Backend!');
 });
+//insert endpoint
+app.post('/insert-data', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { name, email } = req.body;
+        yield db.none('INSERT INTO sample_table(name, email) VALUES($1, $2)', [name, email]);
+        res.status(200).json({ message: 'Data inserted successfully' });
+    }
+    catch (error) {
+        console.error('Error inserting data:', error);
+        res.status(500).json({ error: 'Failed to insert data' });
+    }
+}));
+//fetch endpoint 
+app.get('/fetch-data', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const data = yield fetchSampleData();
+        res.json(data);
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Error fetching data.' });
+    }
+}));
+// app.get('/fetch-data', async (req: Request, res: Response) => {
+//   try {
+//     await fetchSampleData();
+//     res.send('Data fetched successfully!');
+//   } catch (error) {
+//     res.status(500).send('Error fetching data.');
+//   }
+// });
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
+});
+process.on('exit', () => {
+    pgp.end();
 });
