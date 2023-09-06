@@ -79,7 +79,7 @@ function fetchSampleData() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const data = yield db.any('SELECT * FROM sample_table');
-            console.log('Fetched Data:', data);
+            // console.log('Fetched Data:', data);
             return data; //return
         }
         catch (error) {

@@ -72,7 +72,7 @@ async function insertSampleRecord() {
 async function fetchSampleData() {
   try {
     const data = await db.any('SELECT * FROM sample_table');
-    console.log('Fetched Data:', data);
+    // console.log('Fetched Data:', data);
     return data; //return
   } catch (error) {
     console.error('Error fetching data:', error);
