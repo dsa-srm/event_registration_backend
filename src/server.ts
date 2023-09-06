@@ -1,9 +1,14 @@
 import express, { Request, Response } from 'express';
 import pgPromise from 'pg-promise';
 
+
 const app = express();
-const port = process.env.PORT || 3000;
+const fs = require('fs');
+const cors = require('cors');
+const port = process.env.PORT || 3001;
 app.use(express.json());
+app.use(cors());
+
 
 const dbConfig = {
   host: 'eventregistration.cxr56pugwihj.ap-south-2.rds.amazonaws.com',
@@ -12,7 +17,7 @@ const dbConfig = {
   user: 'techdsa',
   password: 'password',
   ssl: {
-    rejectUnauthorized: false, // this was the problem
+    rejectUnauthorized: true, // this was the problem
       },
 };
 const pgp = pgPromise();
@@ -80,20 +85,21 @@ async function fetchSampleData() {
 fetchSampleData();
 
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello, TypeScript Backend!');
-});
+// app.get('/', (req: Request, res: Response) => {
+//   res.send('Hello, TypeScript Backend!');
+// });
 
 //insert endpoint
 
 app.post('/insert-data', async (req: Request, res: Response) => {
-  try {    
-    const { name, email } = req.body;    
-    await db.none('INSERT INTO sample_table(name, email) VALUES($1, $2)', [name, email]);    
+  try {
+    const { name, email } = req.body;
+    await db.none('INSERT INTO sample_table(name, email) VALUES($1, $2)', [name, email]);
+    console.log('Data inserted successfully:', { name, email });
     res.status(200).json({ message: 'Data inserted successfully' });
   } catch (error) {
     console.error('Error inserting data:', error);
-    res.status(500).json({ error: 'Failed to insert data' }); 
+    res.status(500).json({ error: 'Failed to insert data' });
   }
 });
 

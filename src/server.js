@@ -15,8 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const pg_promise_1 = __importDefault(require("pg-promise"));
 const app = (0, express_1.default)();
-const port = process.env.PORT || 3000;
+const fs = require('fs');
+const cors = require('cors');
+const port = process.env.PORT || 3001;
 app.use(express_1.default.json());
+app.use(cors());
 const dbConfig = {
     host: 'eventregistration.cxr56pugwihj.ap-south-2.rds.amazonaws.com',
     port: 5432,
@@ -24,7 +27,7 @@ const dbConfig = {
     user: 'techdsa',
     password: 'password',
     ssl: {
-        rejectUnauthorized: false, // this was the problem
+        rejectUnauthorized: true, // this was the problem
     },
 };
 const pgp = (0, pg_promise_1.default)();
@@ -88,14 +91,15 @@ function fetchSampleData() {
 // createTable();
 // insertSampleRecord();
 fetchSampleData();
-app.get('/', (req, res) => {
-    res.send('Hello, TypeScript Backend!');
-});
+// app.get('/', (req: Request, res: Response) => {
+//   res.send('Hello, TypeScript Backend!');
+// });
 //insert endpoint
 app.post('/insert-data', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, email } = req.body;
         yield db.none('INSERT INTO sample_table(name, email) VALUES($1, $2)', [name, email]);
+        console.log('Data inserted successfully:', { name, email });
         res.status(200).json({ message: 'Data inserted successfully' });
     }
     catch (error) {
