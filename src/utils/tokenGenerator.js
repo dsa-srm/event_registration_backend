@@ -28,7 +28,7 @@ const generateToken = () => {
     const token = randomString.generate({
         charset: "alphanumeric",
         lowerCaseOnly: true,
-        length: 8,
+        length: 8, //number of characters
     });
     return token;
 };

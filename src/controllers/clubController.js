@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getClubDetails = exports.addClubDetails = void 0;
-// import dbConfig from '../configs/aws';
 const aws_1 = __importDefault(require("../configs/aws"));
 const uuid_1 = require("uuid");
 const tokenGenerator_1 = __importDefault(require("../utils/tokenGenerator"));
@@ -22,43 +21,54 @@ const tokenGenerator_1 = __importDefault(require("../utils/tokenGenerator"));
 const addClubDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { clubName } = req.body;
+        //checking if valid club name is provided
         if (clubName === undefined || clubName === null || clubName === "") {
-            res.status(404).json({ "message": "club name is required" });
+            res.status(404).json({ message: "club name is required" });
             return;
         }
-        const id = (0, uuid_1.v4)().toString();
-        const token = (0, tokenGenerator_1.default)();
-        const created_at = new Date().toISOString();
-        const updated_at = new Date().toISOString();
-        const query = `INSERT INTO clubs(id,name,code,created_at,updated_at) VALUES($1,$2,$3,$4,$5)`;
+        const id = (0, uuid_1.v4)().toString(); //generating unique id
+        const token = (0, tokenGenerator_1.default)(); //generating token
+        const created_at = new Date().toISOString(); //generating timestamp
+        const updated_at = new Date().toISOString(); //generating timestamp
+        const query = `INSERT INTO clubs(id,name,code,created_at,updated_at) VALUES($1,$2,$3,$4,$5)`; //query to insert data
         try {
-            yield aws_1.default.none(query, [`${id}`, `${clubName}`, `${token}`, `${created_at}`, `${updated_at}`]);
-            res.status(200).json({ message: 'Record inserted successfully' });
+            yield aws_1.default.none(query, [
+                `${id}`,
+                `${clubName}`,
+                `${token}`,
+                `${created_at}`,
+                `${updated_at}`,
+            ]);
+            res.status(200).json({ message: "Record inserted successfully" }); //sending response
         }
         catch (error) {
-            console.log(error);
-            res.status(500).json({ error: 'Error inserting record.', errorMessage: error });
+            res
+                .status(500)
+                .json({ error: "Error inserting record.", errorMessage: error }); //sending error response
         }
     }
     catch (err) {
-        res.status(500).json({ error: err });
+        res.status(500).json({ error: err }); //sending error response
     }
 });
 exports.addClubDetails = addClubDetails;
 const getClubDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const query = `SELECT * FROM clubs`;
+        const query = `SELECT * FROM clubs`; //query to fetch data
         try {
-            const data = yield aws_1.default.any(query);
-            res.status(200).json({ message: 'Record fetched successfully', data: data });
+            const data = yield aws_1.default.any(query); //fetching data
+            res
+                .status(200)
+                .json({ message: "Record fetched successfully", data: data }); //sending response
         }
         catch (error) {
-            console.log(error);
-            res.status(500).json({ error: 'Error fetching record.', errorMessage: error });
+            res
+                .status(500)
+                .json({ error: "Error fetching record.", errorMessage: error }); //sending error response
         }
     }
     catch (err) {
-        res.status(500).json({ error: err });
+        res.status(500).json({ error: err }); //sending error response
     }
 });
 exports.getClubDetails = getClubDetails;
