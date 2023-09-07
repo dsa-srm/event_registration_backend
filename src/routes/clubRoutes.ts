@@ -4,8 +4,8 @@ import { addClubDetails, getClubDetails } from '../controllers/clubController';
 
 const router = express.Router();
 
-router.post('/clubDetail',addClubDetails);
-router.get('/clubDetail',getClubDetails);
+router.post('/clubDetail',addClubDetails);  //add club details
+router.get('/clubDetail',getClubDetails);   //get club details
 
 
 export default router;

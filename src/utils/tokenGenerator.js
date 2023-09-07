@@ -22,34 +22,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const pg_promise_1 = __importDefault(require("pg-promise"));
-const pgp = (0, pg_promise_1.default)();
-const dotenv = __importStar(require("dotenv"));
-dotenv.config();
-const app = (0, express_1.default)();
-const cors = require('cors');
-const port = process.env.PORT;
-app.use(express_1.default.json());
-app.use(cors());
-//importing routes
-const clubRoutes_1 = __importDefault(require("./routes/clubRoutes"));
-app.use('/api/v1', clubRoutes_1.default);
-app.get('/', (req, res) => {
-    const date = new Date().toLocaleString();
-    res.status(200).json({
-        status: 200,
-        message: 'Server Running Successfully',
-        date: date
+const randomString = __importStar(require("randomized-string"));
+const generateToken = () => {
+    const token = randomString.generate({
+        charset: "alphanumeric",
+        lowerCaseOnly: true,
+        length: 8,
     });
-});
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
-process.on('exit', () => {
-    pgp.end();
-});
+    return token;
+};
+exports.default = generateToken;

@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import pgPromise from 'pg-promise';
+const pgp = pgPromise();
 
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -10,7 +11,6 @@ app.use(express.json());
 app.use(cors());
 
 
-const pgp = pgPromise();
 
 
 //importing routes
