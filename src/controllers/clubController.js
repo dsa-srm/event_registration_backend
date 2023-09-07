@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getClubDetails = exports.addClubDetails = void 0;
 const aws_1 = __importDefault(require("../configs/aws"));
 const uuid_1 = require("uuid");
-const tokenGenerator_1 = __importDefault(require("../utils/tokenGenerator"));
 //write your code here
 // if you code exceeds the max length of 50 lines, then write your code in parts inside service and export them here.
 const addClubDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -27,15 +26,15 @@ const addClubDetails = (req, res) => __awaiter(void 0, void 0, void 0, function*
             return;
         }
         const id = (0, uuid_1.v4)().toString(); //generating unique id
-        const token = (0, tokenGenerator_1.default)(); //generating token
+        // const token = generateToken();  //generating token
         const created_at = new Date().toISOString(); //generating timestamp
         const updated_at = new Date().toISOString(); //generating timestamp
-        const query = `INSERT INTO clubs(id,name,code,created_at,updated_at) VALUES($1,$2,$3,$4,$5)`; //query to insert data
+        const query = `INSERT INTO clubs(id,name,created_at,updated_at) VALUES($1,$2,$3,$4)`; //query to insert data
         try {
             yield aws_1.default.none(query, [
                 `${id}`,
                 `${clubName}`,
-                `${token}`,
+                // `${token}`,
                 `${created_at}`,
                 `${updated_at}`,
             ]);
