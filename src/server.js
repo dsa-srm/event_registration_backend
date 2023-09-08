@@ -38,7 +38,8 @@ app.use(express_1.default.json());
 app.use(cors());
 //importing routes
 const clubRoutes_1 = __importDefault(require("./routes/clubRoutes"));
-app.use('/api/v1', clubRoutes_1.default);
+const eventRoutes_1 = __importDefault(require("./routes/eventRoutes"));
+app.use('/api/v1', clubRoutes_1.default, eventRoutes_1.default);
 app.get('/', (req, res) => {
     const date = new Date().toLocaleString();
     res.status(200).json({

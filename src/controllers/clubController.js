@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getClubDetails = exports.addClubDetails = void 0;
 const aws_1 = __importDefault(require("../configs/aws"));
 const uuid_1 = require("uuid");
+// import generateToken from "../utils/tokenGenerator";
 //write your code here
 // if you code exceeds the max length of 50 lines, then write your code in parts inside service and export them here.
 const addClubDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -38,7 +39,7 @@ const addClubDetails = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 `${created_at}`,
                 `${updated_at}`,
             ]);
-            res.status(200).json({ message: "Record inserted successfully" }); //sending response
+            res.status(201).json({ message: "Record inserted successfully" }); //sending response
         }
         catch (error) {
             res

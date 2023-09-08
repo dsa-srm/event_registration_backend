@@ -16,8 +16,10 @@ app.use(cors());
 //importing routes
 
 import clubRoutes from './routes/clubRoutes';
+import eventRoutes from './routes/eventRoutes'
 
-app.use('/api/v1',clubRoutes);
+app.use('/api/v1',clubRoutes,eventRoutes);
+
 
 app.get('/', (req: Request, res: Response) => {
   
@@ -35,7 +37,6 @@ app.get('/', (req: Request, res: Response) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
 
 process.on('exit', () => {
   pgp.end();
