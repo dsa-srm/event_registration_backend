@@ -8,4 +8,6 @@ const clubController_1 = require("../controllers/clubController");
 const router = express_1.default.Router();
 router.post('/clubDetail', clubController_1.addClubDetails); //add club details
 router.get('/clubDetail', clubController_1.getClubDetails); //get club details
+// router.delete('/clubDetail',getClubDetails);   //get club details
+// router.put('/clubDetail',getClubDetails);   //get club details
 exports.default = router;
