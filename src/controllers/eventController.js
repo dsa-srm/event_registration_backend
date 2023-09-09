@@ -38,6 +38,10 @@ const addEventDetails = (req, res) => __awaiter(void 0, void 0, void 0, function
             res.status(201).json({ message: "Event record inserted successfully" }); // sending success response
         }
         catch (error) {
+            if (error.code == '23503') {
+                res.status(500).json({ error: "Selected Club does not exist", errorMessage: error }); //sending error response
+                return;
+            }
             res.status(500).json({ error: "Error inserting event record", errorMessage: error }); // sending error response
         }
     }

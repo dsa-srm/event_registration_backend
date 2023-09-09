@@ -26,7 +26,11 @@ export const addEventDetails = async (req: Request, res: Response) => {
         `${max_allowed}`,
       ]);
       res.status(201).json({ message: "Event record inserted successfully" }); // sending success response
-    } catch (error) {
+    } catch (error:any) {
+      if(error.code == '23503') {  
+        res.status(500).json({ error: "Selected Club does not exist", errorMessage: error }); //sending error response
+      return;
+      }
       res.status(500).json({ error: "Error inserting event record", errorMessage: error }); // sending error response
     }
   } catch (err) {

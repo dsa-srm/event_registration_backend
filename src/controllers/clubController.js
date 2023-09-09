@@ -42,6 +42,7 @@ const addClubDetails = (req, res) => __awaiter(void 0, void 0, void 0, function*
             res.status(201).json({ message: "Record inserted successfully" }); //sending response
         }
         catch (error) {
+            //checking if duplicate record is being inserted
             res
                 .status(500)
                 .json({ error: "Error inserting record.", errorMessage: error }); //sending error response
