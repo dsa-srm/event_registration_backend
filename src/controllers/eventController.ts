@@ -34,7 +34,7 @@ export const updateEvent = async (req: Request, res: Response) => {
   }
 }
 
-  export const addEventDetails = async (req: Request, res: Response) => {
+export const addEventDetails = async (req: Request, res: Response) => {
   try {
     const { eventName, club_id, max_allowed } = req.body;
 
