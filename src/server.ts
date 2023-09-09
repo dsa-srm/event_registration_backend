@@ -16,8 +16,10 @@ app.use(cors());
 //importing routes
 
 import clubRoutes from './routes/clubRoutes';
+import eventRoutes from './routes/eventRoutes'
 
 app.use('/api/v1',clubRoutes);
+app.use('/api/v1',eventRoutes);
 
 app.get('/', (req: Request, res: Response) => {
   
