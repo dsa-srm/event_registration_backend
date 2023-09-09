@@ -4,7 +4,7 @@ import db from '../configs/aws';
 // Update an event
 export const updateEvent = async (req: Request, res: Response) => {
   try {
-    const { event_id, name, club_id } = req.body;
+    const { event_id, name, max_allowed } = req.body;
 
     if (!event_id) {
       return res.status(400).json({ message: 'Event ID is required' });
@@ -19,9 +19,9 @@ export const updateEvent = async (req: Request, res: Response) => {
 
     // Update the event
     const updated_at = new Date().toISOString();
-    await db.none('UPDATE public.events SET name = $1, club_id = $2, updated_at = $3 WHERE id = $4', [
+    await db.none('UPDATE public.events SET name = $1, max_allowed = $2, updated_at = $3 WHERE id = $4', [
       name,
-      club_id,
+      max_allowed,
       updated_at,
       event_id,
     ]);

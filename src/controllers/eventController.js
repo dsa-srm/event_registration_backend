@@ -17,7 +17,7 @@ const aws_1 = __importDefault(require("../configs/aws"));
 // Update an event
 const updateEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { event_id, name, club_id } = req.body;
+        const { event_id, name, max_allowed } = req.body;
         if (!event_id) {
             return res.status(400).json({ message: 'Event ID is required' });
         }
@@ -28,9 +28,9 @@ const updateEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         }
         // Update the event
         const updated_at = new Date().toISOString();
-        yield aws_1.default.none('UPDATE public.events SET name = $1, club_id = $2, updated_at = $3 WHERE id = $4', [
+        yield aws_1.default.none('UPDATE public.events SET name = $1, max_allowed = $2, updated_at = $3 WHERE id = $4', [
             name,
-            club_id,
+            max_allowed,
             updated_at,
             event_id,
         ]);
