@@ -12,9 +12,37 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getEventDetails = exports.addEventDetails = void 0;
+exports.getEventDetails = exports.deleteEvent = exports.addEventDetails = exports.updateEvent = void 0;
 const aws_1 = __importDefault(require("../configs/aws"));
 const uuid_1 = require("uuid");
+// Update an event
+const updateEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id, name, max_allowed } = req.body;
+        if (!id) {
+            return res.status(400).json({ message: 'Event ID is required' });
+        }
+        // Check if the event with the specified ID exists
+        const existingEvent = yield aws_1.default.oneOrNone('SELECT * FROM public.events WHERE id = $1', [id]);
+        if (!existingEvent) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+        // Update the event
+        const updated_at = new Date().toISOString();
+        yield aws_1.default.none('UPDATE public.events SET name = $1, max_allowed = $2, updated_at = $3 WHERE id = $4', [
+            name,
+            max_allowed,
+            updated_at,
+            id,
+        ]);
+        res.status(200).json({ message: 'Event updated successfully' });
+    }
+    catch (error) {
+        console.error('Error updating event:', error);
+        res.status(500).json({ error: 'Error updating event', errorMessage: error });
+    }
+});
+exports.updateEvent = updateEvent;
 const addEventDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { eventName, club_id, max_allowed } = req.body;
@@ -50,6 +78,20 @@ const addEventDetails = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.addEventDetails = addEventDetails;
+// Delete an event
+const deleteEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const id = req.params.id;
+        const query = 'DELETE FROM public.events WHERE id = $1';
+        yield aws_1.default.none(query, [id]);
+        res.status(200).json({ message: 'Event deleted successfully' });
+    }
+    catch (error) {
+        console.error('Error deleting event:', error);
+        res.status(500).json({ error: 'Error deleting event', errorMessage: error });
+    }
+});
+exports.deleteEvent = deleteEvent;
 const getEventDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const query = `SELECT * FROM events`;
