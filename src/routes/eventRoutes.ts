@@ -1,13 +1,16 @@
 import express from 'express';
 
-import { updateEvent, deleteEvent } from '../controllers/eventController';
+import {addEventDetails, getEventDetails, updateEvent, deleteEvent } from '../controllers/eventController';
 
 const router = express.Router();
 
 // Update an event
 router.patch('/eventDetail', updateEvent);
-
 // Delete an event
-router.delete('/eventDetail', deleteEvent);
+router.delete('/eventDetail/:id', deleteEvent);
 
-export default router;
+router.get('/eventDetail', getEventDetails) // fetching the club details
+
+router.post('/eventDetail', addEventDetails) // adding the club details
+
+export default router

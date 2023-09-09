@@ -1,17 +1,18 @@
 import { Request, Response } from 'express';
 import db from '../configs/aws';
+import { v4 as uuidv4 } from "uuid";
 
 // Update an event
 export const updateEvent = async (req: Request, res: Response) => {
   try {
-    const { event_id, name, max_allowed } = req.body;
+    const { id, name, max_allowed } = req.body; 
 
-    if (!event_id) {
+    if (!id) {
       return res.status(400).json({ message: 'Event ID is required' });
     }
 
     // Check if the event with the specified ID exists
-    const existingEvent = await db.oneOrNone('SELECT * FROM public.events WHERE id = $1', [event_id]);
+    const existingEvent = await db.oneOrNone('SELECT * FROM public.events WHERE id = $1', [id]);
 
     if (!existingEvent) {
       return res.status(404).json({ message: 'Event not found' });
@@ -23,7 +24,7 @@ export const updateEvent = async (req: Request, res: Response) => {
       name,
       max_allowed,
       updated_at,
-      event_id,
+      id,
     ]);
 
     res.status(200).json({ message: 'Event updated successfully' });
@@ -31,19 +32,71 @@ export const updateEvent = async (req: Request, res: Response) => {
     console.error('Error updating event:', error);
     res.status(500).json({ error: 'Error updating event', errorMessage: error });
   }
+}
+
+  export const addEventDetails = async (req: Request, res: Response) => {
+  try {
+    const { eventName, club_id, max_allowed } = req.body;
+
+    if (eventName === undefined || eventName === null || eventName === "") {
+      res.status(400).json({ message: "Event name is required" });
+      return;
+    }
+
+    const id = uuidv4().toString(); // generating unique id
+    const created_at = new Date().toISOString(); // generating timestamp
+    const updated_at = new Date().toISOString(); // generating timestamp
+    const query = `INSERT INTO events(id, name, created_at, updated_at, club_id, max_allowed) VALUES($1, $2, $3, $4, $5, $6)`; // query to insert into the table
+
+    try {
+      await db.none(query, [
+        `${id}`,
+        `${eventName}`,
+        `${created_at}`,
+        `${updated_at}`,
+        `${club_id}`,
+        `${max_allowed}`,
+      ]);
+      res.status(201).json({ message: "Event record inserted successfully" }); // sending success response
+    } catch (error:any) {
+      if(error.code == '23503') {  
+        res.status(500).json({ error: "Selected Club does not exist", errorMessage: error }); //sending error response
+      return;
+      }
+      res.status(500).json({ error: "Error inserting event record", errorMessage: error }); // sending error response
+    }
+  } catch (err) {
+    res.status(500).json({ error: err }); // sending error response
+  }
 };
+
 
 
 // Delete an event
 export const deleteEvent = async (req: Request, res: Response) => {
   try {
-    const { event_id } = req.body;
+    const id = req.params.id;
 
     const query = 'DELETE FROM public.events WHERE id = $1';
-    await db.none(query, [event_id]);
+    await db.none(query, [id]);
     res.status(200).json({ message: 'Event deleted successfully' });
   } catch (error) {
     console.error('Error deleting event:', error);
     res.status(500).json({ error: 'Error deleting event', errorMessage: error });
   }
 };
+export const getEventDetails = async (req: Request, res: Response) => {
+  try {
+    const query = `SELECT * FROM events`;
+
+    try {
+      const data = await db.any(query)
+
+      res.status(200).json({ message: "Record fetched successfully", data: data })
+    } catch (error) {
+      res.status(500).json({ error: "Error fetching record", errorMessage: error })
+    }
+  } catch (err) {
+    res.status(500).json({ error: err })
+  }
+}
