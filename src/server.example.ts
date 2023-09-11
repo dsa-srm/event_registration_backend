@@ -9,21 +9,12 @@ const port = process.env.PORT || 3001;
 app.use(express.json());
 app.use(cors());
 
+const dbConfig = require('./configs/aws');
 
-const dbConfig = {
-  host: 'eventregistration.cxr56pugwihj.ap-south-2.rds.amazonaws.com',
-  port: 5432,
-  database: 'EventReg',
-  user: 'techdsa',
-  password: 'password',
-  ssl: {
-    rejectUnauthorized: true, // this was the problem
-      },
-};
 const pgp = pgPromise();
 const db = pgp(dbConfig);
 
-// async function testConnection() {gi
+// async function testConnection() {
 //   const c = await db.connect(); // try to connect
 //   c.done(); // success, release connection
 //   return c.client.serverVersion; // return server version
@@ -72,7 +63,7 @@ async function insertSampleRecord() {
 async function fetchSampleData() {
   try {
     const data = await db.any('SELECT * FROM sample_table');
-    // console.log('Fetched Data:', data);
+    console.log('Fetched Data:', data);
     return data; //return
   } catch (error) {
     console.error('Error fetching data:', error);
