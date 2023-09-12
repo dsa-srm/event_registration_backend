@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getEventDetails = exports.deleteEvent = exports.addEventDetails = exports.updateEvent = void 0;
+exports.getUsersForEvent = exports.getEventDetails = exports.deleteEvent = exports.addEventDetails = exports.updateEvent = void 0;
 const aws_1 = __importDefault(require("../configs/aws"));
 const uuid_1 = require("uuid");
 // Update an event
@@ -108,3 +108,16 @@ const getEventDetails = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.getEventDetails = getEventDetails;
+// Get users for a particular event
+const getUsersForEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const eventId = req.params.id;
+    try {
+        const users = yield aws_1.default.any('SELECT u.* FROM public.registrations r INNER JOIN public.users u ON r.user_id = u.id WHERE r.user_event = $1', [eventId]);
+        res.status(200).json({ message: 'Users for the event fetched successfully', data: users });
+    }
+    catch (error) {
+        console.error('Error fetching users for event:', error);
+        res.status(500).json({ error: 'Error fetching users for event', errorMessage: error });
+    }
+});
+exports.getUsersForEvent = getUsersForEvent;
