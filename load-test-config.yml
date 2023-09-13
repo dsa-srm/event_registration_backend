@@ -1,0 +1,19 @@
+config:
+  target: "http://127.0.0.1:8000/api/v1/users" # Replace with your API endpoint
+  phases:
+    - duration: 60
+      arrivalRate: 5
+
+scenarios:
+  - flow:
+      - beforeRequest:
+          - exec: |
+              const { generateRandomBody } = require('./dataGenerate.js');
+              const requests = [];
+
+              for (let i = 0; i < 5; i++) {
+                const requestBody = generateRandomBody();
+                requests.push(requestBody);
+              }
+
+              return { requests };
