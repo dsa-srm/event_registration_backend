@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteClubDetails = exports.getClubDetails = exports.addClubDetails = void 0;
+exports.getClubAndEventDetails = exports.deleteClubDetails = exports.getClubDetails = exports.addClubDetails = void 0;
 const aws_1 = __importDefault(require("../configs/aws"));
 const uuid_1 = require("uuid");
 // import generateToken from "../utils/tokenGenerator";
@@ -39,7 +39,7 @@ const addClubDetails = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 `${created_at}`,
                 `${updated_at}`,
             ]);
-            res.status(201).json({ message: "Record inserted successfully" }); //sending response
+            res.status(201).json({ message: "Record inserted successfully", club_id: id }); //sending response
         }
         catch (error) {
             //checking if duplicate record is being inserted
@@ -92,3 +92,20 @@ const deleteClubDetails = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.deleteClubDetails = deleteClubDetails;
+const getClubAndEventDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const query = ` SELECT  c.id, e.name FROM public.clubs c  INNER JOIN public.events e
+  ON c.id = e.club_id`; //query to fetch data
+        try {
+            const result = yield aws_1.default.any(query); //fetching data
+            res.status(200).json({ message: "Record fetched successfully", count: result.length, data: result }); //sending response
+        }
+        catch (error) {
+            res.status(500).json({ error: "Error fetching record.", errorMessage: error }); //sending error response
+        }
+    }
+    catch (error) {
+        res.status(500).json({ error: "Internal server error" }); //sending error response
+    }
+});
+exports.getClubAndEventDetails = getClubAndEventDetails;
