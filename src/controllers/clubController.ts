@@ -59,3 +59,22 @@ export const getClubDetails = async (req: Request, res: Response) => {
     res.status(500).json({ error: err }); //sending error response
   }
 };
+
+
+
+export const deleteClubDetails = async (req: Request, res: Response) => {
+  try {
+    const club_id = req.params.id;
+    const query = `DELETE FROM clubs WHERE id = $1`;  //query to delete data
+    try {
+      await db.none(query, [club_id]); //deleting data
+      res.status(200).json({ message: "Record deleted successfully" });  //sending response
+    } catch (error) {
+      res
+        .status(500)
+        .json({ error: "Error deleting record.", errorMessage: error });  //sending error response
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" }); //sending error response
+  }
+}
