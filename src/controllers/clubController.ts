@@ -30,6 +30,8 @@ export const addClubDetails = async (req: Request, res: Response) => {
       ]);
       res.status(201).json({ message: "Record inserted successfully" });  //sending response
     } catch (error) {
+   
+      //checking if duplicate record is being inserted
       res
         .status(500)
         .json({ error: "Error inserting record.", errorMessage: error }); //sending error response
@@ -60,12 +62,10 @@ export const getClubDetails = async (req: Request, res: Response) => {
   }
 };
 
-
-
 export const deleteClubDetails = async (req: Request, res: Response) => {
   try {
     const club_id = req.params.id;
-    const query = `DELETE FROM clubs WHERE id = $1`;  //query to delete data
+    const query = 'DELETE FROM clubs WHERE id = $1;'  //query to delete data
     try {
       await db.none(query, [club_id]); //deleting data
       res.status(200).json({ message: "Record deleted successfully" });  //sending response

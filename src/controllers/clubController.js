@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getClubDetails = exports.addClubDetails = void 0;
+exports.deleteClubDetails = exports.getClubDetails = exports.addClubDetails = void 0;
 const aws_1 = __importDefault(require("../configs/aws"));
 const uuid_1 = require("uuid");
 // import generateToken from "../utils/tokenGenerator";
@@ -42,6 +42,7 @@ const addClubDetails = (req, res) => __awaiter(void 0, void 0, void 0, function*
             res.status(201).json({ message: "Record inserted successfully" }); //sending response
         }
         catch (error) {
+            //checking if duplicate record is being inserted
             res
                 .status(500)
                 .json({ error: "Error inserting record.", errorMessage: error }); //sending error response
@@ -72,3 +73,22 @@ const getClubDetails = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.getClubDetails = getClubDetails;
+const deleteClubDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const club_id = req.params.id;
+        const query = 'DELETE FROM clubs WHERE id = $1;'; //query to delete data
+        try {
+            yield aws_1.default.none(query, [club_id]); //deleting data
+            res.status(200).json({ message: "Record deleted successfully" }); //sending response
+        }
+        catch (error) {
+            res
+                .status(500)
+                .json({ error: "Error deleting record.", errorMessage: error }); //sending error response
+        }
+    }
+    catch (error) {
+        res.status(500).json({ error: "Internal server error" }); //sending error response
+    }
+});
+exports.deleteClubDetails = deleteClubDetails;
