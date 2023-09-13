@@ -78,3 +78,24 @@ export const deleteClubDetails = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal server error" }); //sending error response
   }
 }
+
+
+export const getClubAndEventDetails = async (req: Request, res: Response) => {
+
+try {
+  
+  const query = ` SELECT  c.id, e.name FROM public.clubs c  INNER JOIN public.events e
+  ON c.id = e.club_id`;  //query to fetch data
+  try {
+      const result = await db.any(query); //fetching data
+      res.status(200).json({ message: "Record fetched successfully",count:result.length, data: result });  //sending response
+  } catch (error) {
+        res.status(500).json({ error: "Error fetching record.", errorMessage: error });  //sending error response
+  }
+
+} catch (error) {
+    res.status(500).json({ error: "Internal server error" }); //sending error response
+}
+
+
+}

@@ -9,6 +9,7 @@ const router = express_1.default.Router();
 router.post('/clubs', clubController_1.addClubDetails); //add club details
 router.get('/clubs', clubController_1.getClubDetails); //get club details
 router.delete('/clubs/:id', clubController_1.deleteClubDetails); //delete club details
+router.get('/allClubEvent', clubController_1.getClubAndEventDetails); //add club details
 // router.delete('/clubDetail',getClubDetails);   //get club details
 // router.put('/clubDetail',getClubDetails);   //get club details
 exports.default = router;
