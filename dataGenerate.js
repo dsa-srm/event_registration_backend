@@ -21,28 +21,32 @@ function generateRandomYear() {
   return Math.floor(Math.random() * 4) + 1; // Year 1 to 4
 }
 
-function generateRandomBody() {
-  const name = generateRandomName();
-  const phone = generateRandomPhoneNumber();
-  const reg = `RA${String(Math.floor(Math.random() * 1000)).padStart(13, '0')}`;
-  const email = `${name.toLowerCase()}@example.com`;
-  const department = generateRandomDepartment();
-  const year = generateRandomYear();
 
-  // Randomly select a club and an event from the predefined JSON data
-  const randomClub = clubData[Math.floor(Math.random() * clubData.length)];
-  const randomEvent = randomClub.user_events[Math.floor(Math.random() * randomClub.user_events.length)];
+module.exports = {
+  generateRandomBody: function (requestParams, context, ee, next) {
+    const name = generateRandomName();
+    const phone = generateRandomPhoneNumber();
+    const reg = `RA${String(Math.floor(Math.random() * 1000)).padStart(13, '0')}`;
+    const email = `${name.toLowerCase()}@example.com`;
+    const department = generateRandomDepartment();
+    const year = generateRandomYear();
+  
+    // Randomly select a club and an event from the predefined JSON data
+    const randomClub = clubData[Math.floor(Math.random() * clubData.length)];
+    const randomEvent = randomClub.user_events[Math.floor(Math.random() * randomClub.user_events.length)];
+  
+    let data = {
+      "name":name,
+      "phone":phone,
+      "reg":reg,
+      "email":email,
+      "department":department,
+      "year":year,
+      "user_club":randomClub.club_id,
+      "user_event":randomEvent
 
-  return {
-    name,
-    phone,
-    reg,
-    email,
-    department,
-    year,
-    user_club: randomClub.club_id,
-    user_event: randomEvent,
-  };
-}
-
-module.exports =  generateRandomBody;
+    };
+    context.vars['data'] = data;
+    return next();
+  }
+};
