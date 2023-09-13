@@ -28,7 +28,7 @@ export const addClubDetails = async (req: Request, res: Response) => {
         `${created_at}`,
         `${updated_at}`,
       ]);
-      res.status(201).json({ message: "Record inserted successfully" });  //sending response
+      res.status(201).json({ message: "Record inserted successfully" ,club_id:id});  //sending response
     } catch (error) {
    
       //checking if duplicate record is being inserted
