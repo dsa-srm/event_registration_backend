@@ -6,8 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const clubController_1 = require("../controllers/clubController");
 const router = express_1.default.Router();
-router.post('/clubDetail', clubController_1.addClubDetails); //add club details
-router.get('/clubDetail', clubController_1.getClubDetails); //get club details
+router.post('/clubs', clubController_1.addClubDetails); //add club details
+router.get('/clubs', clubController_1.getClubDetails); //get club details
+router.delete('/clubs/:id', clubController_1.deleteClubDetails); //delete club details
 // router.delete('/clubDetail',getClubDetails);   //get club details
 // router.put('/clubDetail',getClubDetails);   //get club details
 exports.default = router;
