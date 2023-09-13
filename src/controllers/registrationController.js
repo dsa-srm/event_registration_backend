@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteRegistration = exports.updateRegistration = exports.getRegistrationById = exports.getAllRegistrations = exports.registerUserForEvent = void 0;
+exports.getAllRegistrations = exports.registerUserForEvent = void 0;
 const aws_1 = __importDefault(require("../configs/aws"));
 const uuid_1 = require("uuid");
 const registerUserForEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -37,6 +37,7 @@ const registerUserForEvent = (req, res) => __awaiter(void 0, void 0, void 0, fun
             const registrationCount = parseInt(registrationCountResult.count, 10);
             // Check if booking is possible
             if (registrationCount >= maxAllowed) {
+                yield aws_1.default.none('DELETE FROM public.users WHERE id = $1', [user_id]);
                 return res.status(400).json({ message: 'Event is fully booked' });
             }
             // Generate a unique registration ID
@@ -69,50 +70,43 @@ const getAllRegistrations = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.getAllRegistrations = getAllRegistrations;
-// Get a particular registration by ID
-const getRegistrationById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const registrationId = req.params.id;
-    try {
-        const registration = yield aws_1.default.oneOrNone('SELECT * FROM public.registrations WHERE id = $1', [registrationId]);
-        if (registration) {
-            res.status(200).json({ message: 'Registration fetched successfully', data: registration });
-        }
-        else {
-            res.status(404).json({ message: 'Registration not found' });
-        }
-    }
-    catch (error) {
-        console.error('Error fetching registration by ID:', error);
-        res.status(500).json({ error: 'Error fetching registration', errorMessage: error });
-    }
-});
-exports.getRegistrationById = getRegistrationById;
+// // Get a particular registration by ID
+// export const getRegistrationById = async (req: Request, res: Response) => {
+//   const registrationId = req.params.id;
+//   try {
+//     const registration = await db.oneOrNone('SELECT * FROM public.registrations WHERE id = $1', [registrationId]);
+//     if (registration) {
+//       res.status(200).json({ message: 'Registration fetched successfully', data: registration });
+//     } else {
+//       res.status(404).json({ message: 'Registration not found' });
+//     }
+//   } catch (error) {
+//     console.error('Error fetching registration by ID:', error);
+//     res.status(500).json({ error: 'Error fetching registration', errorMessage: error });
+//   }
+// };
 // Update a registration by ID
-const updateRegistration = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const registrationId = req.params.id;
-    const { user_id, user_club, user_event } = req.body;
-    try {
-        // Implement the code for updating a registration by ID here
-        // This controller is responsible for updating an existing registration
-    }
-    catch (error) {
-        console.error('Error updating registration:', error);
-        res.status(500).json({ error: 'Error updating registration', errorMessage: error });
-    }
-});
-exports.updateRegistration = updateRegistration;
+// export const updateRegistration = async (req: Request, res: Response) => {
+//   const registrationId = req.params.id;
+//   const { user_id, user_club, user_event } = req.body;
+//   try {
+//     // Implement the code for updating a registration by ID here
+//     // This controller is responsible for updating an existing registration
+//   } catch (error) {
+//     console.error('Error updating registration:', error);
+//     res.status(500).json({ error: 'Error updating registration', errorMessage: error });
+//   }
+// };
 // Delete a registration by ID
-const deleteRegistration = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const registrationId = req.params.id;
-    try {
-        // Implement the code for deleting a registration by ID here
-        // This controller is responsible for deleting an existing registration
-        yield aws_1.default.none('DELETE FROM public.registrations WHERE id = $1', [registrationId]);
-        res.status(200).json({ message: 'User unregistered successfully' });
-    }
-    catch (error) {
-        console.error('Error deleting registration:', error);
-        res.status(500).json({ error: 'Error deleting registration', errorMessage: error });
-    }
-});
-exports.deleteRegistration = deleteRegistration;
+// export const deleteRegistration = async (req: Request, res: Response) => {
+//   const registrationId = req.params.id;
+//   try {
+//     // Implement the code for deleting a registration by ID here
+//     // This controller is responsible for deleting an existing registration
+//     await db.none('DELETE FROM public.registrations WHERE id = $1', [registrationId]);
+//     res.status(200).json({ message: 'User unregistered successfully' });
+//   } catch (error) {
+//     console.error('Error deleting registration:', error);
+//     res.status(500).json({ error: 'Error deleting registration', errorMessage: error });
+//   }
+// };

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserEvents = exports.getUserDetails = exports.deleteUser = exports.updateUser = exports.createUser = exports.getAllUsers = void 0;
+exports.getUserEvents = exports.getUserDetails = exports.createUser = exports.getAllUsers = void 0;
 const aws_1 = __importDefault(require("../configs/aws")); // Assuming you have a database configuration set up
 const uuid_1 = require("uuid");
 // Get all users
@@ -28,12 +28,17 @@ const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.getAllUsers = getAllUsers;
 // Create a new user
-const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, phone, reg, email, department, year } = req.body;
         // Validate required fields
         if (!name || !phone || !reg || !email || !department || !year) {
             return res.status(400).json({ message: 'All fields are required' });
+        }
+        // Check if user with the same registration number already exists
+        const existingUser = yield aws_1.default.oneOrNone('SELECT id FROM public.users WHERE reg = $1', [reg]);
+        if (existingUser) {
+            return res.status(409).json({ message: 'User already exists' });
         }
         // Generate timestamps
         const created_at = new Date().toISOString();
@@ -41,7 +46,8 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const id = (0, uuid_1.v4)().toString();
         // Insert user into the database
         yield aws_1.default.none('INSERT INTO public.users(id, name, phone, reg, email, department, year, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)', [id, name, phone, reg, email, department, year, created_at, updated_at]);
-        res.status(201).json({ message: 'User created successfully' });
+        req.body.user_id = id;
+        next();
     }
     catch (error) {
         console.error('Error creating user:', error);
@@ -50,40 +56,42 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.createUser = createUser;
 // Update a user
-const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const id = req.params.id;
-        const { name, phone, reg, email, department, year } = req.body;
-        // Check if the user with the specified ID exists
-        const existingUser = yield aws_1.default.oneOrNone('SELECT * FROM public.users WHERE id = $1', [id]);
-        if (!existingUser) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        // Update the user
-        const updated_at = new Date().toISOString();
-        yield aws_1.default.none('UPDATE public.users SET name = $1, phone = $2, reg = $3, email = $4, department = $5, year = $6, updated_at = $7 WHERE id = $8', [name, phone, reg, email, department, year, updated_at, id]);
-        res.status(200).json({ message: 'User updated successfully' });
-    }
-    catch (error) {
-        console.error('Error updating user:', error);
-        res.status(500).json({ error: 'Error updating user', errorMessage: error });
-    }
-});
-exports.updateUser = updateUser;
+// export const updateUser = async (req: Request, res: Response) => {
+//   try {
+//     const id = req.params.id;
+//     const { name, phone, reg, email, department, year } = req.body;
+//     // Check if the user with the specified ID exists
+//     const existingUser = await db.oneOrNone(
+//       'SELECT * FROM public.users WHERE id = $1',
+//       [id]
+//     );
+//     if (!existingUser) {
+//       return res.status(404).json({ message: 'User not found' });
+//     }
+//     // Update the user
+//     const updated_at = new Date().toISOString();
+//     await db.none(
+//       'UPDATE public.users SET name = $1, phone = $2, reg = $3, email = $4, department = $5, year = $6, updated_at = $7 WHERE id = $8',
+//       [name, phone, reg, email, department, year, updated_at, id]
+//     );
+//     res.status(200).json({ message: 'User updated successfully' });
+//   } catch (error) {
+//     console.error('Error updating user:', error);
+//     res.status(500).json({ error: 'Error updating user', errorMessage: error });
+//   }
+// };
 // Delete a user
-const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const id = req.params.id;
-        // Delete the user with the specified ID
-        yield aws_1.default.none('DELETE FROM public.users WHERE id = $1', [id]);
-        res.status(200).json({ message: 'User deleted successfully' });
-    }
-    catch (error) {
-        console.error('Error deleting user:', error);
-        res.status(500).json({ error: 'Error deleting user', errorMessage: error });
-    }
-});
-exports.deleteUser = deleteUser;
+// export const deleteUser = async (req: Request, res: Response) => {
+//   try {
+//     const id = req.params.id;
+//     // Delete the user with the specified ID
+//     await db.none('DELETE FROM public.users WHERE id = $1', [id]);
+//     res.status(200).json({ message: 'User deleted successfully' });
+//   } catch (error) {
+//     console.error('Error deleting user:', error);
+//     res.status(500).json({ error: 'Error deleting user', errorMessage: error });
+//   }
+// };
 // const users = await db.any(
 //   'SELECT u.* FROM public.registrations r INNER JOIN public.users u ON r.user_id = u.id WHERE r.user_event = $1',
 //   [eventId]

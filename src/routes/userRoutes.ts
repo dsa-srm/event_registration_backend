@@ -1,24 +1,24 @@
 import express from 'express';
 import {
   createUser,
-  updateUser,
-  deleteUser,
   getUserDetails,
   getAllUsers,
   getUserEvents
 } from '../controllers/userController';
 
+import { registerUserForEvent } from '../controllers/registrationController';
+
 const router = express.Router();
 router.get('/users',getAllUsers)
 
 // Create a new user
-router.post('/users', createUser);
+router.post('/users', createUser,registerUserForEvent);
 
-// Update a user
-router.patch('/users/:id', updateUser);
+// // Update a user
+// router.patch('/users/:id', updateUser);
 
-// Delete a user
-router.delete('/users/:id', deleteUser);
+// // Delete a user
+// router.delete('/users/:id', deleteUser);
 
 // Fetch user details
 router.get('/users/:id', getUserDetails);
