@@ -7,30 +7,29 @@ config:
       arrivalRate: 1
       rampTo: 5
       name: Warm up phase
+    - duration: 60
+      arrivalRate: 50
+      rampTo: 80
+      name: Ramp up load
+    - duration: 120
+      arrivalRate: 10
+      rampTo: 100
+      name: Spike phase
   processor: "./dataGenerate.js"
-    # - duration: 60
-    #   arrivalRate: 5
-    #   rampTo: 20
-    #   name: Ramp up load
-    # - duration: 120
-    #   arrivalRate: 10
-    #   rampTo: 50
-    #   name: Spike phase
-  # Load & configure a couple of useful plugins
-  # https://docs.art/reference/extensions
-  # plugins:
-  #   ensure: {}
-  #   apdex: {}
-  #   metrics-by-endpoint: {}
-  # apdex:
-  #   threshold: 100
-  # ensure:
-  #     thresholds:
-  #       - http.response_time.p99: 100
-  #       - http.response_time.p95: 75
+
+  plugins:
+    ensure: {}
+    apdex: {}
+    metrics-by-endpoint: {}
+  apdex:
+    threshold: 100
+  ensure:
+      thresholds:
+        - http.response_time.p99: 100
+        - http.response_time.p95: 75
 scenarios:
   - flow:
-      - post:
+     - post:
           url: "/users"
           beforeRequest: "generateRandomBody"
           json: "{{ data }}"
