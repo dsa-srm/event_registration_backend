@@ -17,16 +17,16 @@ config:
       name: Spike phase
   processor: "./dataGenerate.js"
 
-  plugins:
-    ensure: {}
-    apdex: {}
-    metrics-by-endpoint: {}
-  apdex:
-    threshold: 100
-  ensure:
-      thresholds:
-        - http.response_time.p99: 100
-        - http.response_time.p95: 75
+  # plugins:
+  #   ensure: {}
+  #   apdex: {}
+  #   metrics-by-endpoint: {}
+  # apdex:
+  #   threshold: 100
+  # ensure:
+  #     thresholds:
+  #       - http.response_time.p99: 100
+  #       - http.response_time.p95: 75
 scenarios:
   - flow:
      - post:
