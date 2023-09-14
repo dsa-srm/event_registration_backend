@@ -38,7 +38,8 @@ const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         // Check if user with the same registration number already exists
         const existingUser = yield aws_1.default.oneOrNone('SELECT id FROM public.users WHERE reg = $1', [reg]);
         if (existingUser) {
-            return res.status(409).json({ message: 'User already exists' });
+            req.body.user_id = existingUser.id;
+            return next();
         }
         // Generate timestamps
         const created_at = new Date().toISOString();
