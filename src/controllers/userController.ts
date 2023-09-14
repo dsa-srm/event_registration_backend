@@ -28,7 +28,8 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
     const existingUser = await db.oneOrNone('SELECT id FROM public.users WHERE reg = $1', [reg]);
 
     if (existingUser) {
-      return res.status(409).json({ message: 'User already exists' });
+      req.body.user_id = existingUser.id;
+      return next();
     }
 
     // Generate timestamps
