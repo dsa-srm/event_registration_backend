@@ -100,3 +100,17 @@ export const getEventDetails = async (req: Request, res: Response) => {
     res.status(500).json({ error: err })
   }
 }
+// Get users for a particular event
+export const getUsersForEvent = async (req: Request, res: Response) => {
+  const eventId = req.params.id;
+  try {
+    const users = await db.any(
+      'SELECT u.* FROM public.registrations r INNER JOIN public.users u ON r.user_id = u.id WHERE r.user_event = $1',
+      [eventId]
+    );
+    res.status(200).json({ message: 'Users for the event fetched successfully', data: users });
+  } catch (error) {
+    console.error('Error fetching users for event:', error);
+    res.status(500).json({ error: 'Error fetching users for event', errorMessage: error });
+  }
+};

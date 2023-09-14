@@ -28,7 +28,7 @@ export const addClubDetails = async (req: Request, res: Response) => {
         `${created_at}`,
         `${updated_at}`,
       ]);
-      res.status(201).json({ message: "Record inserted successfully" });  //sending response
+      res.status(201).json({ message: "Record inserted successfully" ,club_id:id});  //sending response
     } catch (error) {
    
       //checking if duplicate record is being inserted
@@ -61,3 +61,41 @@ export const getClubDetails = async (req: Request, res: Response) => {
     res.status(500).json({ error: err }); //sending error response
   }
 };
+
+export const deleteClubDetails = async (req: Request, res: Response) => {
+  try {
+    const club_id = req.params.id;
+    const query = 'DELETE FROM clubs WHERE id = $1;'  //query to delete data
+    try {
+      await db.none(query, [club_id]); //deleting data
+      res.status(200).json({ message: "Record deleted successfully" });  //sending response
+    } catch (error) {
+      res
+        .status(500)
+        .json({ error: "Error deleting record.", errorMessage: error });  //sending error response
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" }); //sending error response
+  }
+}
+
+
+export const getClubAndEventDetails = async (req: Request, res: Response) => {
+
+try {
+  
+  const query = ` SELECT  c.id, e.name FROM public.clubs c  INNER JOIN public.events e
+  ON c.id = e.club_id`;  //query to fetch data
+  try {
+      const result = await db.any(query); //fetching data
+      res.status(200).json({ message: "Record fetched successfully",count:result.length, data: result });  //sending response
+  } catch (error) {
+        res.status(500).json({ error: "Error fetching record.", errorMessage: error });  //sending error response
+  }
+
+} catch (error) {
+    res.status(500).json({ error: "Internal server error" }); //sending error response
+}
+
+
+}
