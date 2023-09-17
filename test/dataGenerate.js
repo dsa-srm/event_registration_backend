@@ -26,7 +26,7 @@ module.exports = {
   generateRandomBody: function (requestParams, context, ee, next) {
     const name = generateRandomName();
     const phone = generateRandomPhoneNumber();
-    const reg = `RA${String(Math.floor(Math.random() * 1000)).padStart(13, '0')}`;
+    const reg = `RA${String(Math.floor(Math.random() * 10000000000000)).padStart(13, '0')}`;
     const email = `${name.toLowerCase()}@example.com`;
     const department = generateRandomDepartment();
     const year = generateRandomYear();
