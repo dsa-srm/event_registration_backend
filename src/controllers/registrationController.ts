@@ -81,7 +81,17 @@ export const registerUserForEvent = async (req: Request, res: Response) => {
 					]
 				);
 			}
+			// Check if the user is already registered for the same event
+			const existingRegistration = await t.oneOrNone(
+				"SELECT * FROM public.registrations WHERE user_id = $1 AND user_event = $2",
+				[id, user_event]
+			);
 
+			if (existingRegistration) {
+				return res
+					.status(400)
+					.json({ message: "User is already registered for this event" });
+			}
 			// Generate a unique registration ID
 			const registrationId = uuidv4().toString();
 			const created_at = new Date().toISOString();
