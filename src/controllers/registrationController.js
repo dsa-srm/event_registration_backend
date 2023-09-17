@@ -17,74 +17,43 @@ const aws_1 = __importDefault(require("../configs/aws"));
 const uuid_1 = require("uuid");
 const registerUserForEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, phone, reg, email, department, year, user_club, user_event } = req.body;
-        // Validate required fields
-        if (!name ||
-            !phone ||
-            !reg ||
-            !email ||
-            !department ||
-            !year ||
-            !user_club ||
-            !user_event) {
-            return res.status(400).json({ message: "All fields are required" });
-        }
-        // Fetch the max_allowed value for the event and check if the event exists
-        const eventInfo = yield aws_1.default.oneOrNone("SELECT max_allowed FROM public.events WHERE id = $1 FOR UPDATE", [user_event]);
-        if (!eventInfo) {
-            // Event not found, return an error
-            return res.status(404).json({
-                message: "Event not found or someone else is booking. Please try again",
-            });
-        }
-        const maxAllowed = eventInfo.max_allowed;
+        const { user_id, user_club, user_event } = req.body;
         // Start a PostgreSQL transaction with Serializable isolation level
-        yield aws_1.default.tx((t) => __awaiter(void 0, void 0, void 0, function* () {
+        yield aws_1.default.tx('serializable', (t) => __awaiter(void 0, void 0, void 0, function* () {
+            // Check if the user is already registered for the same event
+            const existingRegistration = yield t.oneOrNone('SELECT * FROM public.registrations WHERE user_id = $1 AND user_event = $2', [user_id, user_event]);
+            if (existingRegistration) {
+                return res.status(400).json({ message: 'User is already registered for this event' });
+            }
+            // Fetch the max_allowed value for the event and check if the event exists
+            const eventInfo = yield t.oneOrNone('SELECT max_allowed FROM public.events WHERE id = $1 FOR UPDATE', [user_event]);
+            if (!eventInfo) {
+                // Event not found, return an error
+                return res.status(404).json({ message: 'Event not found Or Someone else is Booking, Please try again' });
+            }
+            const maxAllowed = eventInfo.max_allowed;
             // Count the number of registrations for the event
-            const registrationCountResult = yield t.one("SELECT COUNT(*) FROM public.registrations WHERE user_event = $1", [user_event]);
+            const registrationCountResult = yield t.one('SELECT COUNT(*) FROM public.registrations WHERE user_event = $1', [user_event]);
             const registrationCount = parseInt(registrationCountResult.count, 10);
             // Check if booking is possible
             if (registrationCount >= maxAllowed) {
-                return res.status(400).json({ message: "Event is fully booked" });
-            }
-            // Check if user with the same registration number already exists
-            const existingUser = yield t.oneOrNone("SELECT id FROM public.users WHERE reg = $1", [reg]);
-            let id;
-            if (existingUser) {
-                id = existingUser.id;
-            }
-            else {
-                // Generate timestamps
-                const created_at = new Date().toISOString();
-                const updated_at = new Date().toISOString();
-                id = (0, uuid_1.v4)().toString();
-                // Insert user into the database
-                yield t.none("INSERT INTO public.users(id, name, phone, reg, email, department, year, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)", [
-                    id,
-                    name,
-                    phone,
-                    reg,
-                    email,
-                    department,
-                    year,
-                    created_at,
-                    updated_at,
-                ]);
+                yield aws_1.default.none('DELETE FROM public.users WHERE id = $1', [user_id]);
+                return res.status(400).json({ message: 'Event is fully booked' });
             }
             // Generate a unique registration ID
             const registrationId = (0, uuid_1.v4)().toString();
             const created_at = new Date().toISOString();
             const updated_at = new Date().toISOString();
             // Insert the registration into the registrations table
-            yield t.none("INSERT INTO public.registrations(id, user_id, user_club, user_event, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6)", [registrationId, id, user_club, user_event, created_at, updated_at]);
-            res.status(201).json({ message: "User registered for the event" });
+            yield t.none('INSERT INTO public.registrations(id, user_id, user_club, user_event, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6)', [registrationId, user_id, user_club, user_event, created_at, updated_at]);
+            res.status(201).json({ message: 'User registered for the event' });
         }));
     }
     catch (error) {
-        console.error("Error registering user for event:", error);
+        console.error('Error registering user for event:', error);
         res.status(500).json({
-            error: "Error registering user for event",
-            errorMessage: error, // Use error.message to capture the error message
+            error: 'Error registering user for event',
+            errorMessage: error,
         });
     }
 });
@@ -92,17 +61,12 @@ exports.registerUserForEvent = registerUserForEvent;
 // Get all registrations
 const getAllRegistrations = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const registrations = yield aws_1.default.any("SELECT * FROM public.registrations");
-        res.status(200).json({
-            message: "Registrations fetched successfully",
-            data: registrations,
-        });
+        const registrations = yield aws_1.default.any('SELECT * FROM public.registrations');
+        res.status(200).json({ message: 'Registrations fetched successfully', data: registrations });
     }
     catch (error) {
-        console.error("Error fetching registrations:", error);
-        res
-            .status(500)
-            .json({ error: "Error fetching registrations", errorMessage: error });
+        console.error('Error fetching registrations:', error);
+        res.status(500).json({ error: 'Error fetching registrations', errorMessage: error });
     }
 });
 exports.getAllRegistrations = getAllRegistrations;

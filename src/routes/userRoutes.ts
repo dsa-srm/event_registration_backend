@@ -12,7 +12,7 @@ const router = express.Router();
 router.get('/users',getAllUsers)
 
 // Create a new user
-router.post('/users', createUser);
+router.post('/users', createUser,registerUserForEvent);
 
 // // Update a user
 // router.patch('/users/:id', updateUser);
