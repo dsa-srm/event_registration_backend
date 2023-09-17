@@ -4,16 +4,16 @@ config:
   target: http://18.60.85.218:8000/api/v1
   phases:
     - duration: 10
-      arrivalRate: 10
-      rampTo: 20
+      arrivalRate: 1
+      rampTo: 5
       name: Warm up phase
     - duration: 60
-      arrivalRate: 200
-      rampTo: 500
+      arrivalRate: 50
+      rampTo: 80
       name: Ramp up load
     - duration: 120
-      arrivalRate: 50
-      rampTo: 800
+      arrivalRate: 10
+      rampTo: 100
       name: Spike phase
   processor: "./dataGenerate.js"
 
@@ -33,3 +33,5 @@ scenarios:
           url: "/users"
           beforeRequest: "generateRandomBody"
           json: "{{ data }}"
+         
+       
