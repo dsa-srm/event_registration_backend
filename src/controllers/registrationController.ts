@@ -20,22 +20,6 @@ export const registerUserForEvent = async (req: Request, res: Response) => {
 		) {
 			return res.status(400).json({ message: "All fields are required" });
 		}
-
-		// Fetch the max_allowed value for the event and check if the event exists
-		const eventInfo = await db.oneOrNone(
-			"SELECT max_allowed FROM public.events WHERE id = $1 FOR UPDATE",
-			[user_event]
-		);
-
-		if (!eventInfo) {
-			// Event not found, return an error
-			return res.status(404).json({
-				message: "Event not found or someone else is booking. Please try again",
-			});
-		}
-
-		const maxAllowed = eventInfo.max_allowed;
-
 		// Start a PostgreSQL transaction with Serializable isolation level
 		await db.tx(async (t) => {
 			// Count the number of registrations for the event
@@ -43,6 +27,22 @@ export const registerUserForEvent = async (req: Request, res: Response) => {
 				"SELECT COUNT(*) FROM public.registrations WHERE user_event = $1",
 				[user_event]
 			);
+
+			// Fetch the max_allowed value for the event and check if the event exists
+			const eventInfo = await db.oneOrNone(
+				"SELECT max_allowed FROM public.events WHERE id = $1 FOR UPDATE",
+				[user_event]
+			);
+
+			if (!eventInfo) {
+				// Event not found, return an error
+				return res.status(404).json({
+					message:
+						"Event not found or someone else is booking. Please try again",
+				});
+			}
+
+			const maxAllowed = eventInfo.max_allowed;
 
 			const registrationCount = parseInt(registrationCountResult.count, 10);
 
@@ -163,16 +163,20 @@ export const getAllRegistrations = async (req: Request, res: Response) => {
 // };
 
 // Delete a registration by ID
-// export const deleteRegistration = async (req: Request, res: Response) => {
-//   const registrationId = req.params.id;
+export const deleteRegistration = async (req: Request, res: Response) => {
+	const registrationId = req.params.id;
 
-//   try {
-//     // Implement the code for deleting a registration by ID here
-//     // This controller is responsible for deleting an existing registration
-//     await db.none('DELETE FROM public.registrations WHERE id = $1', [registrationId]);
-//     res.status(200).json({ message: 'User unregistered successfully' });
-//   } catch (error) {
-//     console.error('Error deleting registration:', error);
-//     res.status(500).json({ error: 'Error deleting registration', errorMessage: error });
-//   }
-// };
+	try {
+		// Implement the code for deleting a registration by ID here
+		// This controller is responsible for deleting an existing registration
+		await db.none("DELETE FROM public.registrations WHERE id = $1", [
+			registrationId,
+		]);
+		res.status(200).json({ message: "User unregistered successfully" });
+	} catch (error) {
+		console.error("Error deleting registration:", error);
+		res
+			.status(500)
+			.json({ error: "Error deleting registration", errorMessage: error });
+	}
+};
