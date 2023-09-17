@@ -71,13 +71,6 @@ const registerUserForEvent = (req, res) => __awaiter(void 0, void 0, void 0, fun
                     updated_at,
                 ]);
             }
-            // Check if the user is already registered for the same event
-            const existingRegistration = yield t.oneOrNone("SELECT * FROM public.registrations WHERE user_id = $1 AND user_event = $2", [id, user_event]);
-            if (existingRegistration) {
-                return res
-                    .status(400)
-                    .json({ message: "User is already registered for this event" });
-            }
             // Generate a unique registration ID
             const registrationId = (0, uuid_1.v4)().toString();
             const created_at = new Date().toISOString();
