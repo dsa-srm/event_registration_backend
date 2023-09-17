@@ -21,8 +21,13 @@ export const registerUserForEvent = async (req: Request, res: Response) => {
 			return res.status(400).json({ message: "All fields are required" });
 		}
 
-		// Fetch the max_allowed value for the event and check if the event exists
-		const eventInfo = await db.oneOrNone(
+	
+
+		// Start a PostgreSQL transaction with Serializable isolation level
+		await db.tx(async (t) => {
+
+				// Fetch the max_allowed value for the event and check if the event exists
+		const eventInfo = await t.oneOrNone(
 			"SELECT max_allowed FROM public.events WHERE id = $1 FOR UPDATE",
 			[user_event]
 		);
@@ -35,9 +40,6 @@ export const registerUserForEvent = async (req: Request, res: Response) => {
 		}
 
 		const maxAllowed = eventInfo.max_allowed;
-
-		// Start a PostgreSQL transaction with Serializable isolation level
-		await db.tx(async (t) => {
 			// Count the number of registrations for the event
 			const registrationCountResult = await t.one(
 				"SELECT COUNT(*) FROM public.registrations WHERE user_event = $1",
@@ -102,7 +104,7 @@ export const registerUserForEvent = async (req: Request, res: Response) => {
 				"INSERT INTO public.registrations(id, user_id, user_club, user_event, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6)",
 				[registrationId, id, user_club, user_event, created_at, updated_at]
 			);
-
+              
 			res.status(201).json({ message: "User registered for the event" });
 		});
 	} catch (error) {

@@ -29,17 +29,17 @@ const registerUserForEvent = (req, res) => __awaiter(void 0, void 0, void 0, fun
             !user_event) {
             return res.status(400).json({ message: "All fields are required" });
         }
-        // Fetch the max_allowed value for the event and check if the event exists
-        const eventInfo = yield aws_1.default.oneOrNone("SELECT max_allowed FROM public.events WHERE id = $1 FOR UPDATE", [user_event]);
-        if (!eventInfo) {
-            // Event not found, return an error
-            return res.status(404).json({
-                message: "Event not found or someone else is booking. Please try again",
-            });
-        }
-        const maxAllowed = eventInfo.max_allowed;
         // Start a PostgreSQL transaction with Serializable isolation level
         yield aws_1.default.tx((t) => __awaiter(void 0, void 0, void 0, function* () {
+            // Fetch the max_allowed value for the event and check if the event exists
+            const eventInfo = yield t.oneOrNone("SELECT max_allowed FROM public.events WHERE id = $1 FOR UPDATE", [user_event]);
+            if (!eventInfo) {
+                // Event not found, return an error
+                return res.status(404).json({
+                    message: "Event not found or someone else is booking. Please try again",
+                });
+            }
+            const maxAllowed = eventInfo.max_allowed;
             // Count the number of registrations for the event
             const registrationCountResult = yield t.one("SELECT COUNT(*) FROM public.registrations WHERE user_event = $1", [user_event]);
             const registrationCount = parseInt(registrationCountResult.count, 10);

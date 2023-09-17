@@ -54,6 +54,7 @@ export const createUser = async (
 		);
 		req.body.user_id = id;
 		res.status(201).json({ error: "User successfully created" });
+    next();
 	} catch (error) {
 		console.error("Error creating user:", error);
 		res.status(500).json({ error: "Error creating user", errorMessage: error });

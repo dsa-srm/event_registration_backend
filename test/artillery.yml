@@ -1,20 +1,7 @@
 config:
   # This is a test server run by team Artillery
   # It's designed to be highly scalable
-  #  duration: 10
-  #     arrivalRate: 10
-  #     rampTo: 20
-  #     name: Warm up phase
-  # duration: 60
-  #   arrivalRate: 200
-  #   rampTo: 500
-  #   name: Ramp up load
-  # duration: 120
-  # arrivalRate: 50
-  # rampTo: 800
-  # name: Spike phase
-
-  target: http://localhost:8000/api/v1
+  target: http://18.60.85.218:8000/api/v1
   phases:
     - duration: 10
       arrivalRate: 10
@@ -29,19 +16,6 @@ config:
       rampTo: 800
       name: Spike phase
   processor: "./dataGenerate.js"
-  #   - duration: 10
-  #     arrivalRate: 1
-  #     rampTo: 5
-  #     name: Warm up phase
-  #   - duration: 60
-  #     arrivalRate: 100
-  #     rampTo: 500
-  #     name: Ramp up load
-  #   - duration: 120
-  #     arrivalRate: 80
-  #     rampTo: 500
-  #     name: Spike phase
-  # processor: "./dataGenerate.js"
 
   # plugins:
   #   ensure: {}
@@ -56,6 +30,6 @@ config:
 scenarios:
   - flow:
       - post:
-          url: "/registrations"
+          url: "/users"
           beforeRequest: "generateRandomBody"
           json: "{{ data }}"
