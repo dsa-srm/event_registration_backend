@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.414.0",
     "@types/express": "^4.17.17",
     "@types/node": "^20.5.9",
     "cors": "^2.8.5",
@@ -8,6 +9,7 @@
     "fs": "^0.0.1-security",
     "pg-promise": "^11.5.4",
     "randomized-string": "^1.2.7",
+    "throttled-queue": "^2.1.4",
     "typescript": "^5.2.2",
     "uuid": "^9.0.0",
     "winston": "^3.10.0"
