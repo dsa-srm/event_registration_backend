@@ -20,16 +20,10 @@ export const registerUserForEvent = async (req: Request, res: Response) => {
 		) {
 			return res.status(400).json({ message: "All fields are required" });
 		}
-		// Start a PostgreSQL transaction with Serializable isolation level
-		await db.tx(async (t) => {
-			// Count the number of registrations for the event
-			const registrationCountResult = await t.one(
-				"SELECT COUNT(*) FROM public.registrations WHERE user_event = $1",
-				[user_event]
-			);
 
+		await db.tx(async (t) => {
 			// Fetch the max_allowed value for the event and check if the event exists
-			const eventInfo = await db.oneOrNone(
+			const eventInfo = await t.oneOrNone(
 				"SELECT max_allowed FROM public.events WHERE id = $1 FOR UPDATE",
 				[user_event]
 			);
@@ -44,72 +38,89 @@ export const registerUserForEvent = async (req: Request, res: Response) => {
 
 			const maxAllowed = eventInfo.max_allowed;
 
-			const registrationCount = parseInt(registrationCountResult.count, 10);
-
 			// Check if booking is possible
-			if (registrationCount >= maxAllowed) {
+			if (maxAllowed <= 0) {
 				return res.status(400).json({ message: "Event is fully booked" });
-			}
-
-			// Check if user with the same registration number already exists
-			const existingUser = await t.oneOrNone(
-				"SELECT id FROM public.users WHERE reg = $1",
-				[reg]
-			);
-			let id;
-			if (existingUser) {
-				id = existingUser.id;
 			} else {
-				// Generate timestamps
-				const created_at = new Date().toISOString();
-				const updated_at = new Date().toISOString();
-				id = uuidv4().toString();
+				// You can update the max_allowed value here based on your business logic
+				// For example, decrement it by 1 to simulate a booking
+				const updatedMaxAllowed = maxAllowed - 1;
 
-				// Insert user into the database
+				// Update the max_allowed value in the events table
 				await t.none(
-					"INSERT INTO public.users(id, name, phone, reg, email, department, year, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+					"UPDATE public.events SET max_allowed = $1 WHERE id = $2",
+					[updatedMaxAllowed, user_event]
+				);
+
+				// Check if user with the same registration number already exists
+				const existingUser = await t.oneOrNone(
+					"SELECT id FROM public.users WHERE reg = $1",
+					[reg]
+				);
+				let id;
+
+				if (existingUser) {
+					id = existingUser.id;
+					// Check if the user with the same registration number is already registered for the event
+					const existingRegistration = await t.oneOrNone(
+						"SELECT id FROM public.registrations WHERE user_id = $1 AND user_event = $2",
+						[id, user_event]
+					);
+
+					if (existingRegistration) {
+						return res
+							.status(400)
+							.json({ message: "User is already registered for the event" });
+					}
+				} else {
+					// Generate timestamps
+					const created_at = new Date().toISOString();
+					const updated_at = new Date().toISOString();
+					id = uuidv4().toString();
+
+					// Insert user into the database
+					await t.none(
+						"INSERT INTO public.users(id, name, phone, reg, email, department, year, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+						[
+							id,
+							name,
+							phone,
+							reg,
+							email,
+							department,
+							year,
+							created_at,
+							updated_at,
+						]
+					);
+				}
+
+				// Generate a unique registration ID
+				const registrationId = uuidv4().toString();
+				const registration_created_at = new Date().toISOString();
+				const registration_updated_at = new Date().toISOString();
+
+				// Insert the registration into the registrations table
+				await t.none(
+					"INSERT INTO public.registrations(id, user_id, user_club, user_event, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6)",
 					[
+						registrationId,
 						id,
-						name,
-						phone,
-						reg,
-						email,
-						department,
-						year,
-						created_at,
-						updated_at,
+						user_club,
+						user_event,
+						registration_created_at,
+						registration_updated_at,
 					]
 				);
+
+				res.status(201).json({ message: "User registered for the event" });
 			}
-			// Check if the user is already registered for the same event
-			const existingRegistration = await t.oneOrNone(
-				"SELECT * FROM public.registrations WHERE user_id = $1 AND user_event = $2",
-				[id, user_event]
-			);
-
-			if (existingRegistration) {
-				return res
-					.status(400)
-					.json({ message: "User is already registered for this event" });
-			}
-			// Generate a unique registration ID
-			const registrationId = uuidv4().toString();
-			const created_at = new Date().toISOString();
-			const updated_at = new Date().toISOString();
-
-			// Insert the registration into the registrations table
-			await t.none(
-				"INSERT INTO public.registrations(id, user_id, user_club, user_event, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6)",
-				[registrationId, id, user_club, user_event, created_at, updated_at]
-			);
-
-			res.status(201).json({ message: "User registered for the event" });
 		});
 	} catch (error) {
 		console.error("Error registering user for event:", error);
 		res.status(500).json({
 			error: "Error registering user for event",
-			errorMessage: error, // Use error.message to capture the error message
+			errorMessage: error,
 		});
 	}
 };

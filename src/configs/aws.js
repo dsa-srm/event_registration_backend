@@ -29,7 +29,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
 const pg_promise_1 = __importDefault(require("pg-promise"));
-const fs = require('fs');
+const fs = require("fs");
 const pgp = (0, pg_promise_1.default)();
 const dbConfig = {
     host: process.env.DBHOST,
