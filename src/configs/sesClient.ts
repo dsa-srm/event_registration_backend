@@ -1,5 +1,7 @@
 import { SESClient } from "@aws-sdk/client-ses";
-const REGION = "ap-south-1";
+import * as dotenv from "dotenv";
 
-const sesClient = new SESClient({ region: REGION });
+dotenv.config();
+
+const sesClient = new SESClient({ region: process.env.REGION });
 export { sesClient };

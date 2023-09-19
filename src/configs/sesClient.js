@@ -22,24 +22,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.sesClient = void 0;
+const client_ses_1 = require("@aws-sdk/client-ses");
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
-const pg_promise_1 = __importDefault(require("pg-promise"));
-const fs = require('fs');
-const pgp = (0, pg_promise_1.default)();
-const dbConfig = {
-    host: process.env.DBHOST,
-    port: 5432,
-    database: process.env.DATABASE,
-    user: process.env.USER,
-    password: process.env.PASSWORD,
-    ssl: {
-        rejectUnauthorized: true,
-    },
-};
-const db = pgp(dbConfig);
-exports.default = db;
+const sesClient = new client_ses_1.SESClient({ region: process.env.REGION });
+exports.sesClient = sesClient;
