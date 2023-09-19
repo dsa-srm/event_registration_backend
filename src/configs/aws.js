@@ -40,7 +40,7 @@ const dbConfig = {
     password: process.env.PASSWORD,
     ssl: {
         // ca: fs.readFileSync(pemFile),
-        rejectUnauthorized: false, // this was the problem
+        rejectUnauthorized: true, // this was the problem
     },
 };
 const db = pgp(dbConfig);
