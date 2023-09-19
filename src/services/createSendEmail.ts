@@ -14,7 +14,7 @@ export const createSendEmail = (email: string) => {
         Html: {
           Charset: "UTF-8",
           Data: `
-                    <h1>Hi,<h1>
+                    < h1>Hi,<h1>
                     <p>Welcome to Shuru!<p>
                     `,
         },
