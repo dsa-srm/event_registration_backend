@@ -1,16 +1,17 @@
 import express from "express";
-import {
-	registerUserForEvent,
-	getAllRegistrations,
-	deleteRegistration,
-} from "../controllers/registrationController";
+import { validateRequiredFields } from "../middlewares/registration";
+import { RegistrationController } from "../controllers/registrationController";
 
 const router = express.Router();
 
-router.post("/registrations", registerUserForEvent);
+router.post(
+	"/registrations",
+	validateRequiredFields,
+	RegistrationController.registerUserForEvent
+);
 
 // Get all registrations
-router.get("/registrations", getAllRegistrations);
+router.get("/registrations", RegistrationController.getAllRegistrations);
 
 // // Get a particular registration by ID
 // router.get('/registrations/:id', getRegistrationById);
@@ -19,6 +20,6 @@ router.get("/registrations", getAllRegistrations);
 // router.patch('/registrations/:id', updateRegistration);
 
 // Delete a registration by ID
-router.delete("/registrations/:id", deleteRegistration);
+router.delete("/registrations/:id", RegistrationController.deleteRegistration);
 
 export default router;

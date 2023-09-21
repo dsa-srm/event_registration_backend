@@ -24,10 +24,6 @@ config:
       arrivalRate: 200
       rampTo: 500
       name: Ramp up load
-    - duration: 120
-      arrivalRate: 50
-      rampTo: 800
-      name: Spike phase
   processor: "./dataGenerate.js"
 
   # plugins:
