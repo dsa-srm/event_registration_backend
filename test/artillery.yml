@@ -17,12 +17,12 @@ config:
   target: http://127.0.0.1:8000/api/v1
   phases:
     - duration: 10
-      arrivalRate: 10
-      rampTo: 20
+      arrivalRate: 1
+      rampTo: 5
       name: Warm up phase
     - duration: 60
-      arrivalRate: 200
-      rampTo: 500
+      arrivalRate: 50
+      rampTo: 80
       name: Ramp up load
   processor: "./dataGenerate.js"
 
@@ -39,6 +39,6 @@ config:
 scenarios:
   - flow:
       - post:
-          url: "/registrations"
+          url: "/users"
           beforeRequest: "generateRandomBody"
           json: "{{ data }}"
