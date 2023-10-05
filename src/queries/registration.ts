@@ -16,12 +16,12 @@ export class RegistrationQueries {
 	static async updateRegistration(
 		registrationId: string,
 		user_id: string,
-		user_club: string,
+		// user_club: string,
 		user_event: string
 	) {
 		await db.none(
-			"UPDATE public.registrations SET user_id = $1, user_club = $2, user_event = $3 WHERE id = $4",
-			[user_id, user_club, user_event, registrationId]
+			"UPDATE public.registrations SET user_id = $1, user_event = $2 WHERE id = $3",
+			[user_id, user_event, registrationId]
 		);
 	}
 
@@ -46,17 +46,17 @@ export class RegistrationQueries {
 		t: any,
 		registrationId: string,
 		id: string,
-		user_club: string,
+		// user_club: string,
 		user_event: string,
 		registration_created_at: string,
 		registration_updated_at: string
 	) {
 		return await t.none(
-			"INSERT INTO public.registrations(id, user_id, user_club, user_event, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6)",
+			"INSERT INTO public.registrations(id, user_id, user_event, created_at, updated_at) VALUES($1, $2, $3, $4, $5)",
 			[
 				registrationId,
 				id,
-				user_club,
+				// user_club,
 				user_event,
 				registration_created_at,
 				registration_updated_at,

@@ -17,7 +17,7 @@ export class RegistrationService {
 				email,
 				department,
 				year,
-				user_club,
+				// user_club,
 				user_event,
 			} = req.body;
 
@@ -96,7 +96,7 @@ export class RegistrationService {
 						t,
 						registrationId,
 						id,
-						user_club,
+						// user_club,
 						user_event,
 						registration_created_at,
 						registration_updated_at
@@ -116,7 +116,7 @@ export class RegistrationService {
 
 	static async getAllRegistrations(req: Request, res: Response) {
 		try {
-			const registrations = await RegistrationQueries.fetchAllRegistrations;
+			const registrations = await RegistrationQueries.fetchAllRegistrations();
 			res.status(200).json({
 				message: "Registrations fetched successfully",
 				data: registrations,

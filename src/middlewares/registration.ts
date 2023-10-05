@@ -5,8 +5,7 @@ export function validateRequiredFields(
 	res: Response,
 	next: NextFunction
 ) {
-	const { name, phone, reg, email, department, year, user_club, user_event } =
-		req.body;
+	const { name, phone, reg, email, department, year, user_event } = req.body;
 
 	// Define the list of required fields
 	const requiredFields = [
@@ -16,7 +15,7 @@ export function validateRequiredFields(
 		"email",
 		"department",
 		"year",
-		"user_club",
+		// "user_club",
 		"user_event",
 	];
 
@@ -30,13 +29,25 @@ export function validateRequiredFields(
 	});
 
 	if (missingOrEmptyFields.length > 0) {
-		return res
-			.status(400)
-			.json({
-				message: `Missing or empty required fields: ${missingOrEmptyFields.join(
-					", "
-				)}`,
-			});
+		return res.status(400).json({
+			message: `Missing or empty required fields`,
+			missing: missingOrEmptyFields.join(", "),
+		});
+	}
+
+	// Check registration number pattern
+	if (!/^RA23\d{11}$/.test(reg)) {
+		return res.status(400).json({
+			message:
+				"Event is only for first year students, Check Reg.No and resubmit !",
+		});
+	}
+
+	// Check email pattern
+	if (!/^[a-zA-Z0-9]+@srmist\.edu\.in$/.test(email)) {
+		return res.status(400).json({
+			message: "Event is only for SRM Students, Check Mail.id and resubmit !",
+		});
 	}
 
 	// If all required fields are present and not empty, continue to the next middleware or route handler

@@ -7,7 +7,7 @@ export interface RegistrationInfo {
 	email: string;
 	department: string;
 	year: number;
-	user_club: string;
+	// user_club: string;
 	user_event: string;
 }
 

@@ -23,7 +23,9 @@ class RegistrationService {
     static registerUserForEvent(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { name, phone, reg, email, department, year, user_club, user_event, } = req.body;
+                const { name, phone, reg, email, department, year, 
+                // user_club,
+                user_event, } = req.body;
                 yield aws_1.default.tx((t) => __awaiter(this, void 0, void 0, function* () {
                     // Fetch the max_allowed value for the event and check if the event exists
                     const eventInfo = yield events_1.EventQueries.fetchMaxAllowed(t, user_event);
@@ -70,7 +72,9 @@ class RegistrationService {
                         const registration_created_at = new Date().toISOString();
                         const registration_updated_at = new Date().toISOString();
                         // Insert the registration into the registrations table
-                        yield registration_1.RegistrationQueries.registerUser(t, registrationId, id, user_club, user_event, registration_created_at, registration_updated_at);
+                        yield registration_1.RegistrationQueries.registerUser(t, registrationId, id, 
+                        // user_club,
+                        user_event, registration_created_at, registration_updated_at);
                         res.status(201).json({ message: "User registered for the event" });
                     }
                 }));
@@ -87,7 +91,7 @@ class RegistrationService {
     static getAllRegistrations(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const registrations = yield registration_1.RegistrationQueries.fetchAllRegistrations;
+                const registrations = yield registration_1.RegistrationQueries.fetchAllRegistrations();
                 res.status(200).json({
                     message: "Registrations fetched successfully",
                     data: registrations,

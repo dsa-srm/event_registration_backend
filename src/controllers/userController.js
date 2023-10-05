@@ -18,12 +18,16 @@ const uuid_1 = require("uuid");
 // Get all users
 const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const users = yield aws_1.default.any('SELECT * FROM public.users');
-        res.status(200).json({ message: 'All users fetched successfully', data: users });
+        const users = yield aws_1.default.any("SELECT * FROM public.users");
+        res
+            .status(200)
+            .json({ message: "All users fetched successfully", data: users });
     }
     catch (error) {
-        console.error('Error fetching all users:', error);
-        res.status(500).json({ error: 'Error fetching all users', errorMessage: error });
+        console.error("Error fetching all users:", error);
+        res
+            .status(500)
+            .json({ error: "Error fetching all users", errorMessage: error });
     }
 });
 exports.getAllUsers = getAllUsers;
@@ -33,10 +37,10 @@ const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         const { name, phone, reg, email, department, year } = req.body;
         // Validate required fields
         if (!name || !phone || !reg || !email || !department || !year) {
-            return res.status(400).json({ message: 'All fields are required' });
+            return res.status(400).json({ message: "All fields are required" });
         }
         // Check if user with the same registration number already exists
-        const existingUser = yield aws_1.default.oneOrNone('SELECT id FROM public.users WHERE reg = $1', [reg]);
+        const existingUser = yield aws_1.default.oneOrNone("SELECT id FROM public.users WHERE reg = $1", [reg]);
         if (existingUser) {
             req.body.user_id = existingUser.id;
             return next();
@@ -46,13 +50,13 @@ const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         const updated_at = new Date().toISOString();
         const id = (0, uuid_1.v4)().toString();
         // Insert user into the database
-        yield aws_1.default.none('INSERT INTO public.users(id, name, phone, reg, email, department, year, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)', [id, name, phone, reg, email, department, year, created_at, updated_at]);
+        yield aws_1.default.none("INSERT INTO public.users(id, name, phone, reg, email, department, year, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)", [id, name, phone, reg, email, department, year, created_at, updated_at]);
         req.body.user_id = id;
         next();
     }
     catch (error) {
-        console.error('Error creating user:', error);
-        res.status(500).json({ error: 'Error creating user', errorMessage: error });
+        console.error("Error creating user:", error);
+        res.status(500).json({ error: "Error creating user", errorMessage: error });
     }
 });
 exports.createUser = createUser;
@@ -102,19 +106,21 @@ const getUserDetails = (req, res) => __awaiter(void 0, void 0, void 0, function*
     try {
         const id = req.params.id;
         // Retrieve user details based on the specified ID
-        const user = yield aws_1.default.oneOrNone('SELECT * FROM public.users WHERE id = $1', [id]);
+        const user = yield aws_1.default.oneOrNone("SELECT * FROM public.users WHERE id = $1", [id]);
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: "User not found" });
         }
-        const events = yield aws_1.default.any('SELECT u.id , u.name  FROM public.registrations r INNER JOIN public.events u ON r.user_event = u.id WHERE r.user_id = $1', [id]);
+        const events = yield aws_1.default.any("SELECT u.id , u.name  FROM public.registrations r INNER JOIN public.events u ON r.user_event = u.id WHERE r.user_id = $1", [id]);
         user.events = events;
-        res.status(200).json({ message: 'User details fetched successfully', user });
+        res
+            .status(200)
+            .json({ message: "User details fetched successfully", user });
     }
     catch (error) {
-        console.error('Error fetching user details:', error);
+        console.error("Error fetching user details:", error);
         res
             .status(500)
-            .json({ error: 'Error fetching user details', errorMessage: error });
+            .json({ error: "Error fetching user details", errorMessage: error });
     }
 });
 exports.getUserDetails = getUserDetails;
@@ -127,14 +133,16 @@ exports.getUserDetails = getUserDetails;
 const getUserEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const reg_no = req.params.reg_no;
-        const events = yield aws_1.default.any('SELECT e.id, e.name FROM public.events e INNER JOIN public.registrations r ON e.id = r.user_event WHERE r.user_id = (SELECT id FROM public.users WHERE reg = $1);', [reg_no]);
-        res.status(200).json({ message: 'User events fetched successfully', events: events });
+        const events = yield aws_1.default.any("SELECT e.id, e.name FROM public.events e INNER JOIN public.registrations r ON e.id = r.user_event WHERE r.user_id = (SELECT id FROM public.users WHERE reg = $1);", [reg_no]);
+        res
+            .status(200)
+            .json({ message: "User events fetched successfully", events: events });
     }
     catch (error) {
-        console.error('Error fetching event details:', error);
+        console.error("Error fetching event details:", error);
         res
             .status(500)
-            .json({ error: 'Error fetching event details', errorMessage: error });
+            .json({ error: "Error fetching event details", errorMessage: error });
     }
 });
 exports.getUserEvents = getUserEvents;
