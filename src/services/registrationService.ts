@@ -47,7 +47,11 @@ export class RegistrationService {
 					await EventQueries.updateMaxAllowed(t, updatedMaxAllowed, user_event);
 
 					// Check if user with the same registration number already exists
-					const existingUser = await UserQueries.fetchUserByReg(t, reg);
+					const existingUser = await UserQueries.fetchUserByRegAndMail(
+						t,
+						reg,
+						email
+					);
 					let id;
 
 					if (existingUser) {

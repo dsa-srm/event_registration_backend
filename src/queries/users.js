@@ -18,6 +18,11 @@ class UserQueries {
             ]);
         });
     }
+    static fetchUserByRegAndMail(t, reg, email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield t.oneOrNone("SELECT id FROM public.users WHERE reg = $1 or email = $2", [reg, email]);
+        });
+    }
     static addUser(t, id, name, phone, reg, email, department, year, created_at, updated_at) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield t.none("INSERT INTO public.users(id, name, phone, reg, email, department, year, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)", [id, name, phone, reg, email, department, year, created_at, updated_at]);

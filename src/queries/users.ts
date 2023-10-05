@@ -4,6 +4,12 @@ export class UserQueries {
 			reg,
 		]);
 	}
+	static async fetchUserByRegAndMail(t: any, reg: string, email: string) {
+		return await t.oneOrNone(
+			"SELECT id FROM public.users WHERE reg = $1 or email = $2",
+			[reg, email]
+		);
+	}
 
 	static async addUser(
 		t: any,

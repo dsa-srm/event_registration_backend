@@ -47,7 +47,7 @@ class RegistrationService {
                         // Update the max_allowed value in the events table
                         yield events_1.EventQueries.updateMaxAllowed(t, updatedMaxAllowed, user_event);
                         // Check if user with the same registration number already exists
-                        const existingUser = yield users_1.UserQueries.fetchUserByReg(t, reg);
+                        const existingUser = yield users_1.UserQueries.fetchUserByRegAndMail(t, reg, email);
                         let id;
                         if (existingUser) {
                             id = existingUser.id;
