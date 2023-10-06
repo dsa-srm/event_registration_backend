@@ -21,12 +21,11 @@ app.use("/api/v1", eventRoutes, userRoutes, registrationRoutes);
 
 app.get("/", (req: Request, res: Response) => {
 	const date = new Date().toLocaleString();
-	res.status(200).json({
-		status: 200,
-		message: "Server Running Successfully",
-		date: date,
-	});
+	
+  res.send("Welcome to my home page");
 });
+
+
 
 app.listen(port, () => {
 	console.log(`Server is running on port ${port}`);
